@@ -1,0 +1,224 @@
+# Take a screenshot of a region (left, top, width, height)
+    #screenshot = pyautogui.screenshot(region=(225, 155, 800, 550))
+
+    # Save the screenshot
+    #screenshot.save("region_screenshot.png")
+
+    #img = "region_screenshot.png"
+    #img_cv = cv2.imread(img)
+    #img_rgb = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
+    #thresh = cv2.threshold(v, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+    
+    #d = pytesseract.image_to_data(img_rgb, output_type=Output.DICT)
+
+    # Define the lower and upper bounds of your color range in BGR format
+    #lower_color = np.array([208, 192, 139])  # Example: Lower bound for blue
+    #upper_color = np.array([210, 194, 141])  # Example: Upper bound for blue
+    # Create a mask that isolates pixels within the color range
+    
+    #print(d)
+    '''
+    n_boxes = len(d['level'])
+    for i in range(n_boxes):
+        d['text'][i] = d['text'][i].strip(" ")
+        if (d['text'][i]!="" and d['text'][i]!="," and d['text'][i]!=" " and len(d['text'][i]) >=3 ):
+            (x, y, w, h) = (d['left'][i], d['top'][i], d['width'][i], d['height'][i])
+            cv2.rectangle(img_rgb, (x, y), (x + w, y + h), (0, 255, 0), 3) # in-place operation
+            
+            try:
+                onGroundItem = pyautogui.locateCenterOnScreen("greenSelect.png", region=(225, 155, 800, 550), grayscale=False, confidence=0.25)
+                if(onGroundItem):
+                    #check if on ground item is correct color here
+                    #regions = ( int(onGroundItem[0])-10, int(onGroundItem[1])-15, 150, 50)
+                    #screenshot = pyautogui.screenshot(region=regions)
+                    #screenshot.save("searcheditem.png")
+                    #img = Image.open("searcheditem.png")
+                    #colors = img.getColors(1000)
+
+                    #print(colors)
+                    pyautogui.moveTo(onGroundItem[0] + VarX, onGroundItem[1]+ VarY)
+                    time.sleep(.1)   
+                    pyautogui.leftClick(onGroundItem[0] + VarX, onGroundItem[1]+ VarY)
+                    time.sleep(1.15)
+            except pyautogui.ImageNotFoundException as msg:
+                print(msg)
+    
+
+'''
+    """
+    n_boxes = len(d['level'])
+    for i in range(n_boxes):
+        d['text'][i] = d['text'][i].strip(" ")
+        if (d['text'][i]!="" and d['text'][i]!="," and d['text'][i]!=" " and len(d['text'][i]) >=3 ):
+            (x, y, w, h) = (d['left'][i], d['top'][i], d['width'][i], d['height'][i])
+            cv2.rectangle(img_rgb, (x, y), (x + w, y + h), (0, 255, 0), 3) # in-place operation
+            #pyautogui.moveTo(x + (w/2), y+(h/2))
+            #pyautogui.leftClick(x + w, y + h)
+
+            try:
+                onGroundItem = pyautogui.locateCenterOnScreen("greenSelect.png", region=(225, 155, 900, 550), grayscale=False, confidence=0.25)
+                if(onGroundItem): 
+                    pyautogui.moveTo(onGroundItem[0] + VarX, onGroundItem[1]+ VarY)
+                    time.sleep(1)
+                    pyautogui.leftClick(onGroundItem[0] + VarX, onGroundItem[1]+ VarY)
+                    time.sleep(1)
+            except Exception:
+                print(" error ")
+
+    cv2.imshow('img', img_rgb)
+    cv2.waitKey(0)
+    """\
+    
+
+
+
+    
+'''
+def lootUniques():
+    locChecked = []
+    print("unique search..")
+    lootScreenShots = ["unique.png", "unique2.png", "unique3.png"]
+    #snapshot the screen
+    screenshot = pyautogui.screenshot(region=(50, 50, 1100, 700))
+
+    # Save the screenshot
+    screenshot.save("region_screenshot.png")
+    img = "region_screenshot.png"
+    img_cv = cv2.imread(img)
+    img_rgb = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB )
+
+    gSelect = cv2.imread("unique3.png")
+    result = cv2.matchTemplate(img_cv, gSelect, cv2.TM_CCOEFF_NORMED)
+
+    #print(result)
+    threshold = .8
+    yloc, xloc = np.where(result>=threshold)
+    #min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+    
+    w = gSelect.shape[1]
+    h = gSelect.shape[0]
+    
+    # define range wanted color in HSV
+    lower_val = np.array([70, 125, 140]) 
+    upper_val = np.array([100, 135, 145]) 
+    #cv2.imshow("img_cv", img_rgb )
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
+    if not yloc.any():
+        gSelect = cv2.imread("unique2.png")
+        result = cv2.matchTemplate(img_cv, gSelect, cv2.TM_CCOEFF_NORMED)
+
+        #print(result)
+        yloc, xloc = np.where(result>=threshold) 
+
+        if not yloc.any():
+            gSelect = cv2.imread("unique3.png")
+            result = cv2.matchTemplate(img_cv, gSelect, cv2.TM_CCOEFF_NORMED)
+
+            #print(result)
+            yloc, xloc = np.where(result>=threshold) 
+
+    count = 0
+    nCount = 0
+    for (x, y) in zip(xloc, yloc):
+        if(count>=3):
+            
+            count=0
+            break
+        print(count)
+        if(count>=1): # not first loop..
+            screenshot = pyautogui.screenshot(region=(50, 50, 1100, 550))
+
+            # Save the screenshot
+            screenshot.save("region_screenshot.png")
+            img = "region_screenshot.png"
+            img_cv = cv2.imread(img)
+            img_rgb = cv2.cvtColor(img_cv, cv2.COLOR_RGB2HSV )
+
+            gSelect = cv2.imread("unique3.png")
+            result = cv2.matchTemplate(img_cv, gSelect, cv2.TM_CCOEFF_NORMED)
+            res = np.where(result>=threshold) 
+            yloc2, xloc2 = np.where(result>=threshold)
+            w2 = gSelect.shape[1]
+            h2 = gSelect.shape[0]
+            
+            if not yloc2.any():
+                gSelect = cv2.imread("unique2.png")
+                result = cv2.matchTemplate(img_cv, gSelect, cv2.TM_CCOEFF_NORMED)
+                res = np.where(result>=threshold) 
+                #print(result)
+                yloc2, xloc2 = np.where(result>=threshold) 
+                w2 = gSelect.shape[1]
+                h2 = gSelect.shape[0]
+
+                if not yloc2.any():
+                    gSelect = cv2.imread("unique3.png")
+                    result = cv2.matchTemplate(img_cv, gSelect, cv2.TM_CCOEFF_NORMED)
+
+                    res = np.where(result>=threshold) 
+                    yloc2, xloc2  = np.where(result>=threshold) 
+                    w2 = gSelect.shape[1]
+                    h2 = gSelect.shape[0]
+            for (j, i) in zip(xloc2, yloc2):
+                tryCount = len(res[0])
+
+                if(nCount>=tryCount):
+                        nCount=0
+                        break
+                nCount+=1
+                #######################################
+                #get img of item
+                regions = (int(j), int(i+45), int(w2+50), int(h2))
+                #print(regions)
+                screenshotName = "uniqueImageScreenshot"+ str(nCount) +".png"
+                uniqueImageScreenshot = pyautogui.screenshot(region=(regions))
+                uniqueImageScreenshot.save(screenshotName)
+                uImg2 = cv2.imread(screenshotName)
+                # Threshold the HSV image - any green color will show up as white
+                mask = cv2.inRange(uImg2, lower_val, upper_val)
+                # if there are any white pixels on mask, sum will be > 0
+                hasUniqueColor = np.sum(mask)
+                os.remove(screenshotName)
+                if hasUniqueColor > 0:
+                    print('Unique detected')
+                    #############################################
+
+                    #cv2.rectangle(img_rgb, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                    if(j>=25 and i>=25):
+                        pyautogui.moveTo(265 , 255)
+                        #cv2.rectangle(img_rgb, (j, i), (j + w2, i + h2), (0, 255, 0), 2)
+                        pyautogui.moveTo(j  + 50 + (w2/2) , i  + 50 + (h2/2))
+                        time.sleep(1)
+                        pyautogui.click(j + 50 + (w2/2) , i + 50 + (h2/2))
+                        time.sleep(1)  
+        else:
+            #######################################
+            #get img of item
+            regions = (int(x), int(y+50), int(w+50), int(h))
+            screenshotName="uniqueImageScreenshot.png"
+            uniqueImageScreenshot = pyautogui.screenshot(region=(regions))
+            uniqueImageScreenshot.save(screenshotName)
+            uImg = cv2.imread(screenshotName)
+            # Threshold the HSV image - any green color will show up as white
+            mask = cv2.inRange(uImg, lower_val, upper_val)
+            # if there are any white pixels on mask, sum will be > 0
+            hasUniqueColor = np.sum(mask)
+            os.remove(screenshotName)
+            if hasUniqueColor > 0:
+                print('Unique detected')
+                #############################################
+
+                if(x>=25 and y>=25):
+                    pyautogui.moveTo(265 , 255)
+                    #cv2.rectangle(img_rgb, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                    pyautogui.moveTo(x  + 50 +  (w/2) , y + 50 +  (h/2))
+                    time.sleep(1)
+                    pyautogui.click(x  + 50+  (w/2) , y  + 50 + (h/2))
+                    time.sleep(1)  
+           
+            
+        count+=1
+    #plt.imshow("mask", uImg )
+    #cv2.waitKey(0)
+    #vcv2.destroyAllWindows()
+'''
